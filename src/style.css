@@ -1,0 +1,102 @@
+/*main content wrapper*/
+.mcw {
+     margin-left: 200px;
+     position: relative;
+     min-height: 100%;
+}
+/*globals*/
+body {
+     margin-top: 50px;
+     background-color: #f6f6f6;
+     font-family: Arial, sans-serif;
+     font-size: 14px;
+     letter-spacing: 0.01em;
+     color: #39464e;
+}
+.container-fluid {
+     padding-left: 0;
+     padding-right: 0;
+}
+.msb, .mnb {
+     animation: slidein 300ms forwards;
+     transform-style: preserve-3d;
+}
+.mcw {
+     animation: bodyslidein 300ms forwards;
+     transform-style: preserve-3d;
+}
+body.msb-x .mcw, body.msb-x .mnb {
+     margin-left: 0;
+     animation: bodyslideout 300ms forwards;
+     transform-style: preserve-3d;
+}
+body.msb-x .msb {
+     animation: slideout 300ms forwards;
+     transform-style: preserve-3d;
+}
+@keyframes slidein {
+     0% {
+          left: 0;
+     }
+     100% {
+          left: -200px;
+     }
+}
+@keyframes slideout {
+     0% {
+          left: -200px;
+     }
+     100% {
+          left: 0;
+     }
+}
+@keyframes bodyslidein {
+     0% {
+          margin-left: 200px;
+     }
+     100% {
+          margin-left: 0;
+     }
+}
+@keyframes bodyslideout {
+     0% {
+          margin-left: 0;
+     }
+     100% {
+          margin-left: 200px;
+     }
+}
+@media (max-width: 768px) {
+     @keyframes slidein {
+          0% {
+               left: 0;
+          }
+          100% {
+               left: -150px;
+          }
+     }
+     @keyframes slideout {
+          0% {
+               left: -150px;
+          }
+          100% {
+               left: 0;
+          }
+     }
+     @keyframes bodyslidein {
+          0% {
+               margin-left: 150px;
+          }
+          100% {
+               margin-left: 0;
+          }
+     }
+     @keyframes bodyslideout {
+          0% {
+               margin-left: 0;
+          }
+          100% {
+               margin-left: 150px;
+          }
+     }
+}
