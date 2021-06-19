@@ -1,3 +1,0 @@
-watchEffect is super useful for dynamic routes
-
-empty array is not nullish value (![] == false)
