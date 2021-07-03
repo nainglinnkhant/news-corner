@@ -19,7 +19,7 @@
                     </div>
 
                     <div id="scroll-trigger">
-                         <p v-if="nextPageLoading">Loading...</p>
+                         <secondary-spinner v-if="nextPageLoading" />
                     </div>
                </div>
           </div>
@@ -30,13 +30,15 @@
 import { ref, computed, watchEffect, watch, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import NewsItem from '../components/NewsItem'
+import SecondarySpinner from '../components/SecondarySpinner'
 import useFetchNews from '../hooks/fetchNews.js'
 import useScrollTrigger from '../hooks/scrollTrigger.js'
 
 export default {
      props: ['name'],
      components: {
-          NewsItem
+          NewsItem,
+          SecondarySpinner
      },
      setup(props) {
           const store = useStore()

@@ -42,7 +42,7 @@
                     </div>
 
                     <div id="scroll-trigger">
-                         <p v-if="nextPageLoading">Loading...</p>
+                         <secondary-spinner v-if="nextPageLoading" />
                     </div>
                </div>
           </div>
@@ -54,13 +54,15 @@ import { computed, ref, watchEffect, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import NewsItem from '../components/NewsItem'
+import SecondarySpinner from '../components/SecondarySpinner'
 import useFetchNews from '../hooks/fetchNews.js'
 import useScrollTrigger from '../hooks/scrollTrigger.js'
 
 export default {
      props: ['country'],
      components: {
-          NewsItem
+          NewsItem,
+          SecondarySpinner
      },
      setup(props) {
           const countryCodes = {
