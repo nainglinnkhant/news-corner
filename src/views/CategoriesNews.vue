@@ -18,27 +18,25 @@
                          </news-item>
                     </div>
 
-                    <div id="scroll-trigger">
-                         <secondary-spinner v-if="nextPageLoading" />
-                    </div>
+                    <scroll-trigger :nextPageLoading="nextPageLoading" /> 
                </div>
           </div>
      </div>
 </template>
 
 <script>
-import { ref, computed, watchEffect, watch, onMounted } from 'vue'
+import { ref, computed, watchEffect, watch } from 'vue'
 import { useStore } from 'vuex'
 import NewsItem from '../components/NewsItem'
-import SecondarySpinner from '../components/SecondarySpinner'
-import useFetchNews from '../hooks/fetchNews.js'
-import useScrollTrigger from '../hooks/scrollTrigger.js'
+import ScrollTrigger from '../components/ScrollTrigger'
+import useFetchNews from '../hooks/fetchNews'
+import useScrollTrigger from '../hooks/scrollTrigger'
 
 export default {
      props: ['name'],
      components: {
           NewsItem,
-          SecondarySpinner
+          ScrollTrigger
      },
      setup(props) {
           const store = useStore()
@@ -80,15 +78,7 @@ export default {
 
                if(categoryNews.value) return
 
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
-          })
-
-          onMounted(() => {
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
+               setTimeout(scrollTrigger, 3000)
           })
 
           return {

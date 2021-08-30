@@ -1,24 +1,7 @@
 <template>
      <div class="mcw">
           <div class="container">
-               <div class="row search-bar">
-                    <div class="col-12 col-sm-8 col-md-6">
-                         <form @submit.prevent="search" class="input-group">
-                              <input
-                                   v-model.trim="searchWord"
-                                   type="text"
-                                   class="form-control"
-                                   placeholder="Search..."
-                              >
-
-                              <span class="input-group-btn" @click="search">
-                                   <button class="search-btn btn btn-default" type="button">
-                                        <i class="fas fa-search"></i>
-                                   </button>
-                              </span>
-                         </form>
-                    </div>
-               </div>
+               <the-searchbar :searchWord="searchWord" @change="changeSearchWord" @submit="search" />
 
                <base-spinner v-if="isLoading"></base-spinner>
 
@@ -53,27 +36,27 @@
                          </news-item>
                     </div>
 
-                    <div id="scroll-trigger">
-                         <secondary-spinner v-if="nextPageLoading" />
-                    </div>
+                    <scroll-trigger :nextPageLoading="nextPageLoading" />
                </div>
           </div>
      </div>
 </template>
 
 <script>
-import { ref, computed, watch, watchEffect, onMounted } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import NewsItem from '../components/NewsItem'
-import SecondarySpinner from '../components/SecondarySpinner'
-import useFetchNews from '../hooks/fetchNews.js'
-import useScrollTrigger from '../hooks/scrollTrigger.js'
+import ScrollTrigger from '../components/ScrollTrigger'
+import TheSearchbar from '../components/TheSearchbar'
+import useFetchNews from '../hooks/fetchNews'
+import useScrollTrigger from '../hooks/scrollTrigger'
 
 export default {
      components: {
           NewsItem,
-          SecondarySpinner
+          TheSearchbar,
+          ScrollTrigger
      },
      setup() {
           const searchWord = ref('')
@@ -108,20 +91,15 @@ export default {
                }
           })
 
-          function search() {
-               if(!searchWord.value) return
-               router.push(`/search/${searchWord.value}`)
+          const changeSearchWord = (searchWordValue) => {
+               searchWord.value = searchWordValue
           }
 
-          // window.addEventListener('popstate', () => {
-          //      if(route.fullPath === '/') {
-          //           latestNews.value || fetchNews({ type: 'latest', sortBy: sortBy.value })
-          //           return
-          //      }
-
-          //      if(route.fullPath.slice(1, 7) !== 'search') return
-          //      latestNews.value || fetchNews({ type: 'search', searchWord: route.params.q, sortBy: sortBy.value })
-          // })
+          function search() {
+               const trimmedSearchWord = searchWord.value.trim()
+               if(!trimmedSearchWord) return
+               router.push(`/search/${trimmedSearchWord}`)
+          }
 
           const savedCurrentPage = computed(() => {
                if(!store.getters.getLatestNews.news && !store.getters.getLatestNews[query.value]) return 1
@@ -146,9 +124,7 @@ export default {
 
                currentPage.value = 1
 
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
+               setTimeout(scrollTrigger, 3000)
           })
 
           watch(currentPage, () => {
@@ -167,18 +143,12 @@ export default {
           watch(query, (_, oldValue) => {
                searchWord.value = query.value
                currentPage.value = savedCurrentPage.value
+               
+               const oldVal = oldValue ? oldValue : 'news'
 
-               if(latestNews.value && store.getters.getLatestNews[oldValue]?.length > 2) return
+               if(latestNews.value && store.getters.getLatestNews[oldVal]?.length > 2) return
 
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
-          })
-
-          onMounted(() => {
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
+               setTimeout(scrollTrigger, 3000)
           })
 
           return {
@@ -186,6 +156,7 @@ export default {
                isLoading,
                errorMessage,
                searchWord,
+               changeSearchWord,
                search,
                sortBy,
                nextPageLoading

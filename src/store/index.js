@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import { setNewsObj } from '../utils/utils'
 
 const store = createStore({
      state() {
@@ -25,7 +26,7 @@ const store = createStore({
      },
      actions: {
           async fetchNews (context, payload) {
-               const apiKey = '7a27c80ebaf54106af6502648afe4070'
+               const apiKey = process.env.VUE_APP_API_KEY
 
                let url 
                
@@ -65,43 +66,19 @@ const store = createStore({
      mutations: {
           setNews(state, payload) {
                if(payload.type === 'latest') {
-                    if(payload.currentPage > 1) {
-                         state.latestNews['news'][0] = payload.currentPage
-                         state.latestNews['news'][1] = payload.totalResults
-                         state.latestNews['news'] = [...state.latestNews['news'], ...payload.news]
-                         return
-                    }
-                    state.latestNews['news'] = [payload.currentPage, payload.totalResults, ...payload.news]
+                    setNewsObj(state.latestNews, 'news', payload)
                }
 
                if(payload.type === 'search') {
-                    if(payload.currentPage > 1) {
-                         state.latestNews[payload.searchWord][0] = payload.currentPage
-                         state.latestNews[payload.searchWord][1] = payload.totalResults
-                         state.latestNews[payload.searchWord] = [...state.latestNews[payload.searchWord], ...payload.news]
-                         return
-                    }
-                    state.latestNews[payload.searchWord] = [payload.currentPage, payload.totalResults, ...payload.news]
+                    setNewsObj(state.latestNews, payload.searchWord, payload)
                }
                
                if(payload.type === 'category') {
-                    if(payload.currentPage > 1) {
-                         state.categoryNews[payload.name][0] = payload.currentPage
-                         state.categoryNews[payload.name][1] = payload.totalResults
-                         state.categoryNews[payload.name] = [...state.categoryNews[payload.name], ...payload.news]
-                         return
-                    }
-                    state.categoryNews[payload.name] = [payload.currentPage, payload.totalResults, ...payload.news]
+                    setNewsObj(state.categoryNews, payload.name, payload)
                }
                
                if(payload.type === 'world') {
-                    if(payload.currentPage > 1) {
-                         state.worldNews[payload.country][0] = payload.currentPage
-                         state.worldNews[payload.country][1] = payload.totalResults
-                         state.worldNews[payload.country] = [...state.worldNews[payload.country], ...payload.news]
-                         return
-                    }
-                    state.worldNews[payload.country] = [payload.currentPage, payload.totalResults, ...payload.news]
+                    setNewsObj(state.worldNews, payload.country, payload)
                }
           },
           clearCache(state) {

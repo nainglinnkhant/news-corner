@@ -12,6 +12,7 @@ body {
      font-size: 14px;
      letter-spacing: 0.01em;
      color: #39464e;
+     box-sizing: border-box;
 }
 .container-fluid {
      padding-left: 0;

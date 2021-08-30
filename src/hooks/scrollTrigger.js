@@ -1,7 +1,7 @@
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 
 export default function useScrollTrigger (currentPage, totalResults) {
-     const pageCount = computed(() => totalResults.value / 20)
+     const pageCount = computed(() => Math.ceil(totalResults.value / 20))
      
      function scrollTrigger() {
           const observer = new IntersectionObserver((entries) => {
@@ -16,6 +16,16 @@ export default function useScrollTrigger (currentPage, totalResults) {
           
           observer.observe(document.getElementById('scroll-trigger'))
      }
+
+     let timer;
+
+     onMounted(() => {
+          timer = setTimeout(scrollTrigger, 3000)
+     })
+
+     onBeforeUnmount(() => {
+          clearTimeout(timer)
+     })
 
      return {
           scrollTrigger

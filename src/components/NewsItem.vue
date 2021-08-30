@@ -2,7 +2,13 @@
      <div class="col-12 col-xs-6 col-md-4 col-lg-3">
           <div class="news-item" @click="goToSource">
                <div class="news-img">
-                    <img :src="newsImage" alt="" class="img-responsive">
+                    <object :data="newsImage" type="image/jpg" class="img-responsive" >
+                         <img
+                              src="https://i.stack.imgur.com/y9DpT.jpg"
+                              :alt="news.title"
+                              class="img-responsive"
+                         />
+                    </object>
                </div>
 
                <div class="news-info">
@@ -15,41 +21,32 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { getViewWidth, trimDescription } from '../utils/utils'
 
 export default {
      props: ['news'],
      setup(props) {
-          const vw = ref(Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0));
+          const viewWidth = ref(getViewWidth())
 
-          const newsImage = computed(() => props.news.urlToImage? props.news.urlToImage : 'https://i.stack.imgur.com/y9DpT.jpg')
+          const newsImage = computed(() => {
+               return props.news.urlToImage? props.news.urlToImage : 'https://i.stack.imgur.com/y9DpT.jpg'
+          })
 
           const trimmedDes = computed(() => {
-               if(props.news.description) {
-                    if(vw.value <= 576) return props.news.description
+               return trimDescription(props.news.title.length ,props.news.description, viewWidth.value)
+          })
 
-                    if(vw.value > 576 && props.news.title.length <= 73) {
-                         return `${props.news.description.slice(0, 115).trim()}...`
-                    }
+          const resizeHandler = () => {
+               viewWidth.value = getViewWidth()
+          }
 
-                    if(vw.value > 576 && props.news.title.length > 130) {
-                         return `${props.news.description.slice(0, 35).trim()}...`
-                    }
+          onMounted(() => {
+               window.addEventListener('resize', resizeHandler)
+          })
 
-                    if(vw.value > 576 && props.news.title.length > 105) {
-                         return `${props.news.description.slice(0, 65).trim()}...`
-                    }
-                         
-                    if(vw.value > 576 && props.news.title.length > 94) {
-                         return `${props.news.description.slice(0, 75).trim()}...`
-                    }
-
-                    if(vw.value > 576 && props.news.title.length > 73) {
-                         return `${props.news.description.slice(0, 90).trim()}...`
-                    }
-               }
-               
-               return ''
+          onBeforeUnmount(() => {
+               window.removeEventListener('resize', resizeHandler)
           })
 
           function goToSource() {

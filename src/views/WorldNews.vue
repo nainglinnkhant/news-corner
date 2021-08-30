@@ -1,24 +1,7 @@
 <template>
      <div class="mcw">
           <div class="container">
-               <div class="row search-bar">
-                    <div class="col-12 col-sm-8 col-md-6">
-                         <form @submit.prevent="search" class="input-group">
-                              <input
-                                   v-model.trim="searchWord"
-                                   type="text" 
-                                   class="form-control" 
-                                   placeholder="Search..."
-                              >
-
-                              <span class="input-group-btn" @click="search">
-                                   <button class="search-btn btn btn-default" type="button">
-                                        <i class="fas fa-search"></i>
-                                   </button>
-                              </span>
-                         </form>
-                    </div>
-               </div>
+               <the-searchbar :searchWord="searchWord" @change="changeSearchWord" @submit="search" />
 
                <base-spinner v-if="isLoading"></base-spinner>
 
@@ -41,87 +24,31 @@
                          </news-item>
                     </div>
 
-                    <div id="scroll-trigger">
-                         <secondary-spinner v-if="nextPageLoading" />
-                    </div>
+                    <scroll-trigger :nextPageLoading="nextPageLoading" />
                </div>
           </div>
      </div>
 </template>
 
 <script>
-import { computed, ref, watchEffect, onMounted, watch } from 'vue'
+import { computed, ref, watchEffect, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import NewsItem from '../components/NewsItem'
-import SecondarySpinner from '../components/SecondarySpinner'
-import useFetchNews from '../hooks/fetchNews.js'
-import useScrollTrigger from '../hooks/scrollTrigger.js'
+import TheSearchbar from '../components/TheSearchbar'
+import ScrollTrigger from '../components/ScrollTrigger'
+import useFetchNews from '../hooks/fetchNews'
+import useScrollTrigger from '../hooks/scrollTrigger'
+import { COUNTRY_CODES, convertCountryCode } from '../utils/utils'
 
 export default {
      props: ['country'],
      components: {
           NewsItem,
-          SecondarySpinner
+          TheSearchbar,
+          ScrollTrigger
      },
      setup(props) {
-          const countryCodes = {
-               ae: ['united arab emirates', 'uae'],
-               ar: ['argentina'],
-               at: ['austria'],
-               au: ['australia'],
-               be: ['belgium'],
-               bg: ['bulgaria'],
-               br: ['brazil'],
-               ca: ['canada'],
-               ch: ['switzerland'],
-               cn: ['china'],
-               co: ['colombia'],
-               cu: ['cuba'],
-               cz: ['czech', 'czechia'],
-               de: ['germany'],
-               eg: ['egypt'],
-               fr: ['france'],
-               gb: ['united kingdom', 'uk'],
-               gr: ['greece'],
-               hk: ['hong kong'],
-               hu: ['hungary'],
-               id: ['indonesia'],
-               ie: ['ireland'],
-               il: ['israel'],
-               in: ['india'],
-               it: ['italy'],
-               jp: ['japan'],
-               kr: ['south korea', 'korea'],
-               lt: ['lithuania'],
-               lv: ['latvia'],
-               ma: ['morocco'],
-               mx: ['mexico'],
-               my: ['malaysia'],
-               ng: ['nigeria'],
-               nl: ['netherlands'],
-               no: ['norway'],
-               nz: ['new zealand'],
-               ph: ['philippines'],
-               pl: ['poland'],
-               pt: ['portugal'],
-               ro: ['romania'],
-               rs: ['serbia'],
-               ru: ['russia'],
-               sa: ['saudi arabia'],
-               se: ['sweden'],
-               sg: ['singapore'],
-               si: ['slovenia'],
-               sk: ['slovakia'],
-               th: ['thailand'],
-               tr: ['turkey'],
-               tw: ['taiwan'],
-               ua: ['ukraine'],
-               us: ['united states', 'us'],
-               ve: ['venezuela'],
-               za: ['south africa']
-          }
-
           const searchWord = ref('')
 
           const store = useStore()
@@ -129,7 +56,7 @@ export default {
 
           const countryCode = computed(() => props.country)
 
-          const countryName = computed(() => countryCodes[props.country][0])
+          const countryName = computed(() => COUNTRY_CODES[props.country][0])
 
           const label = computed(() => {
                return countryName.value.split(' ').map(el => el[0].toUpperCase() + el.slice(1)).join(' ')
@@ -145,17 +72,15 @@ export default {
                if(countryNews.value) return
                fetchNews({ type: 'world', country: countryCode.value, currentPage: 1 })
           })
+
+          const changeSearchWord = (searchWordValue) => {
+               searchWord.value = searchWordValue
+          }
           
           function search() {
-               if(!searchWord.value) return
-               router.push(`/world/${convertCountryCode(searchWord.value)}`)
-          }
-
-          function convertCountryCode(countryName) {
-               for(const countryCode in countryCodes) {
-                    // if(countryCodes[countryCode] === countryName.toLowerCase()) return countryCode
-                    if(countryCodes[countryCode].some(name => name === countryName.toLowerCase())) return countryCode
-               }
+               const trimmedSearchWord = searchWord.value.trim()
+               if(!trimmedSearchWord) return
+               router.push(`/world/${convertCountryCode(trimmedSearchWord)}`)
           }
 
           const savedCurrentPage = computed(() => {
@@ -182,15 +107,7 @@ export default {
 
                if(countryNews.value && store.getters.getWorldNews[oldValue]?.length > 2) return
 
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
-          })
-
-          onMounted(() => {
-               setTimeout(() => {
-                    scrollTrigger()
-               }, 3000)
+               setTimeout(scrollTrigger, 3000)
           })
 
           return {
@@ -200,6 +117,7 @@ export default {
                isLoading,
                errorMessage,
                searchWord,
+               changeSearchWord,
                search,
                nextPageLoading
           }
